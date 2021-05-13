@@ -1,0 +1,86 @@
+<div class="dashboard" [formGroup]="filterForm">
+
+  <div class="sidebar-filter">
+    <mat-card class="sidebar">
+      <span class="sidebar__title">number of stops</span>
+      <div class="sidebar__checkList">
+        <div class="sidebar__checkItem">
+          <mat-checkbox
+            [indeterminate]="(indeterminate$ | async)"
+            [formControlName]="filterCheckboxItems.formControlName"
+          >
+            {{filterCheckboxItems.title}}
+          </mat-checkbox>
+        </div>
+        <div formGroupName="filter">
+          <div class="sidebar__checkItem" *ngFor="let subtask of filterCheckboxItems.subFilters">
+            <mat-checkbox
+              [formControlName]="subtask.formControlName"
+            >
+              {{subtask.title}}
+            </mat-checkbox>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="ticket-dashboard">
+
+    <div class="head-filter">
+      <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+        <mat-button-toggle
+          *ngFor="let sortButton of sortBtnItems"
+          (click)="sortTickets(sortButton.value)"
+          [value]="sortButton.value">
+          {{ sortButton.title }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+    <div class="wrap-tickets">
+
+      <mat-card class="ticket" *ngFor="let ticket of dataTickets$ | async">
+        <div class="ticket__title">
+          <div class="ticket__price">{{ ticket.price }} &#36;</div>
+          <div class="ticket__carrier">
+            <img class="ticket__carrierLogo" src="/assets/img/carrier_logo.png" alt="Carrier Logo">
+            <div class="ticket__carrierTitle">{{ ticket.carrier }}</div>
+          </div>
+        </div>
+        <div class="ticket-content" *ngFor="let segment of ticket.segments">
+          <div class="ticket-content__cell">
+            <div class="ticket-content__titles">{{segment.origin}} – {{segment.destination}}</div>
+            <div class="ticket-content__values">
+              {{segment.date | date:'h:mm'}} – {{ segment | converterTimeArrival }}
+            </div>
+          </div>
+          <div class="ticket-content__cell">
+            <div class="ticket-content__titles"> Travel time</div>
+            <div class="ticket-content__values">{{ segment.duration | converterTime}}</div>
+          </div>
+          <div class="ticket-content__cell">
+            <div class="ticket-content__titles">{{ segment.stops.length }} Stops</div>
+            <div class="ticket-content__values">{{ segment.stops }}</div>
+          </div>
+        </div>
+      </mat-card>
+
+    </div>
+
+    <mat-card *ngIf="displayTickets$ | async" class="tickets-counter">
+      <span>{{displayTickets$ | async}}</span>
+      <span>Tickets out of</span>
+      <span>{{totalCounter$ | async}}</span>
+    </mat-card>
+
+    <button
+      class="btn-more"
+      mat-flat-button
+      [disabled]="isShowMore$ | async"
+      (click)="displayMore(5)">
+      Show 5 more tickets!
+    </button>
+
+  </div>
+
+</div>
